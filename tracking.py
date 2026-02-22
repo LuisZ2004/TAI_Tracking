@@ -34,28 +34,15 @@ class ObjectTracking:
             
             print("Successfully connected to OAK-D. Starting video stream...")
 
-            while True:
-                # Fetch the frame from the OAK-D
-                video_in = video_queue.get()
-                frame = video_in.getCvFrame()
+            print("Successfully connected to OAK-D. Grabbing a test frame...")
 
-                # Run YOLO tracking on the frame
-                results = self.model.track(source=frame, persist=True, tracker=self.tracker_config, conf=0.55, iou=0.4)
-                
-                # Check if objects are detected and tracked
-                if results[0].boxes.id is not None:
-                    boxes = results[0].boxes.xyxy.cpu().numpy().astype(int)
-                    track_ids = results[0].boxes.id.cpu().numpy().astype(int)
+            # Fetch a single frame
+            video_in = video_queue.get()
+            frame = video_in.getCvFrame()
 
-                    for box, track_id in zip(boxes, track_ids):
-                        cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), (255, 0, 255), 2)
-                        cv2.putText(frame, f"Id {track_id}", (box[0], box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
-
-                # Display the frame
-                cv2.imshow("OAK-D YOLO Tracking", frame)
-                
-                if cv2.waitKey(1) & 0xFF == ord("q"):
-                    break
+            # Save the frame as an image file on the Pi
+            cv2.imwrite("test_frame.jpg", frame)
+            print("Saved 'test_frame.jpg'. Check your folder to see if the image is valid!")
                     
         cv2.destroyAllWindows()
 
