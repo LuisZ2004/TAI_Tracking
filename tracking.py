@@ -8,22 +8,23 @@ class ObjectTracking:
         self.tracker_config = 'bytetrack.yaml' 
         self.model = YOLO('weights2_21_2026.pt')
 
-        # 1. Initialize DepthAI pipeline
         self.pipeline = dai.Pipeline()
         
-        # 2. Define source (Color Camera) and output (XLink to Pi)
         self.camRgb = self.pipeline.create(dai.node.ColorCamera)
         self.xoutVideo = self.pipeline.create(dai.node.XLinkOut)
         self.xoutVideo.setStreamName("video")
         
-        # 3. Camera properties
-        self.camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A) # Main RGB camera
-        self.camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-        self.camRgb.setInterleaved(False)
+        self.camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+        self.camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_800_P) 
+        
+        # 1. Set a preview size (YOLO typically expects 640x640 or 640x480)
+        self.camRgb.setPreviewSize(640, 480) 
+        # 2. Tell it to interleave the color channels (HWC format for OpenCV)
+        self.camRgb.setInterleaved(True)
         self.camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
         
-        # 4. Link camera to output
-        self.camRgb.video.link(self.xoutVideo.input)
+        # 3. Link the 'preview' output instead of 'video'
+        self.camRgb.preview.link(self.xoutVideo.input)
 
     def track_object(self):
         # Connect to OAK-D and start pipeline
