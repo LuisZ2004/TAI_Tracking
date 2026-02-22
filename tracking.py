@@ -6,7 +6,7 @@ import numpy as np
 class ObjectTracking:
     def __init__(self):
         self.tracker_config = 'bytetrack.yaml' 
-        self.model = YOLO('weights (2).pt')
+        self.model = YOLO('weights2_21_2026.pt')
 
         # 1. Initialize DepthAI pipeline
         self.pipeline = dai.Pipeline()
